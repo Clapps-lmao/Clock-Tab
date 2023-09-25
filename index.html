@@ -6,6 +6,11 @@
     <link rel="stylesheet" type="text/css" href="index.css">
 </head>
 <body>
+
+    <div id="settings-btn" class="setting-button">
+
+    </div>
+
     <div id="clock-time" class="clock-time">
         <h1 class="clock-text">0:00:00</h1>
     </div>
@@ -14,7 +19,7 @@
         <h3>Weather</h3>
     </div>
     <div id="city-text" class="city-text">
-        <h3>City</h3>
+        <h3>Location:</h3>
     </div>
 
     <div id="social-bar" class="social bar">
@@ -52,7 +57,11 @@
         return fetch('https://ipinfo.io?token=cc98be8f188a9a')
             .then(response => response.json())
             .then(data => {
-                return data.city;
+            const locationArray = data.loc.split(',');
+            const city = data.city;
+            const country = data.country;
+
+            return { city, country };
             })
             .catch(error => {
                 console.error('Error getting user location:', error);
@@ -60,52 +69,50 @@
             });
     }
 
-    function updateWeather(city) {
-        const weatherElement = document.querySelector('.weather');
-        const cityElement = document.querySelector('.city-text');
-        const apiKey = "c152eb69aece48a8817210931232509"; // Replace with your actual WeatherAPI API key
-        const apiUrl = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}&temp_f`;
+    function updateWeather(city, country) {
+    const weatherElement = document.querySelector('.weather');
+    const cityElement = document.querySelector('.city-text');
+    const apiKey = "c152eb69aece48a8817210931232509"; // Replace with your actual WeatherAPI API key
+    const apiUrl = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}&temp_f`;
 
-        fetch(apiUrl)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.current) {
-                    const temperature = Math.round(data.current.temp_f);
-                    const description = data.current.condition.text;
+    fetch(apiUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.current) {
+                const temperature = Math.round(data.current.temp_f);
+                const description = data.current.condition.text;
 
-                    weatherElement.innerHTML = `<h3>Temprature: ${temperature} ° F</h3>`;
-                    cityElement.innerHTML = `<h3>City: ${city}</h3>`;
-                } else {
-                    console.error('Error fetching weather data: Invalid API response');
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching weather data:', error);
-            });
-    
+                weatherElement.innerHTML = `<h3>Temperature: ${temperature} °F</h3>`;
+                cityElement.innerHTML = `<h3>Location: ${city}, ${country}</h3>`;
+            } else {
+                console.error('Error fetching weather data: Invalid API response');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching weather data:', error);
+        });
 }
+getUserLocation().then(location => {
+    if (location) {
+        updateWeather(location.city, location.country);
+    } else {
+        console.error('Unable to determine user location.');
+    }
+});
 
-    getUserLocation().then(city => {
-        if (city) {
-            updateWeather(city);
+setInterval(() => {
+    getUserLocation().then(location => {
+        if (location) {
+            updateWeather(location.city, location.country);
         } else {
             console.error('Unable to determine user location.');
         }
     });
-
-    setInterval(() => {
-        getUserLocation().then(city => {
-            if (city) {
-                updateWeather(city);
-            } else {
-                console.error('Unable to determine user location.');
-            }
-        });
-    }, 1800000);
+}, 1800000);
 </script>
 </html>
