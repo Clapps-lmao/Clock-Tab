@@ -1,0 +1,37 @@
+body {
+    background-color: rgb(19, 19, 19);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    height: auto;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    flex-direction: column;
+}
+
+.clock-time {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 45px;
+    height: 35%;
+    width: auto;
+    color: white;
+}
+
+.weather {
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.city-text {
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 10px;
+}
+.social-bar {
+    display: flex;
+    flex-direction: row;
+}
+.github {
+    scale: 10%;
+    cursor: pointer;
+}

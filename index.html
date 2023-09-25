@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clock Tab</title>
+    <link rel="stylesheet" type="text/css" href="index.css">
+</head>
+<body>
+    <div id="clock-time" class="clock-time">
+        <h1 class="clock-text">0:00:00</h1>
+    </div>
+
+    <div id="weather" class="weather">
+        <h3>Weather</h3>
+    </div>
+    <div id="city-text" class="city-text">
+        <h3>City</h3>
+    </div>
+
+    <div id="social-bar" class="social bar">
+        <a href="https://github.com/clapps-lmao" target="_blank">
+            <img src="github.png" class="github">
+        </a>
+    </div>
+</body>
+<script>
+    function updateClock() {
+        const clockElement = document.querySelector('.clock-text');
+        const currentTime = new Date();
+        let hours = currentTime.getHours();
+        const minutes = currentTime.getMinutes().toString().padStart(2, '0');
+        const seconds = currentTime.getSeconds().toString().padStart(2, '0');
+        let ampm = 'AM';
+
+        if (hours > 12) {
+            hours -= 12;
+            ampm = 'PM';
+        }
+
+        if (hours === 0) {
+            hours = 12;
+        }
+
+        const timeString = `${hours}:${minutes}:${seconds} ${ampm}`;
+        clockElement.textContent = timeString;
+    }
+
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    function getUserLocation() {
+        return fetch('https://ipinfo.io?token=cc98be8f188a9a')
+            .then(response => response.json())
+            .then(data => {
+                return data.city;
+            })
+            .catch(error => {
+                console.error('Error getting user location:', error);
+                return null;
+            });
+    }
+
+    function updateWeather(city) {
+        const weatherElement = document.querySelector('.weather');
+        const cityElement = document.querySelector('.city-text');
+        const apiKey = "c152eb69aece48a8817210931232509"; // Replace with your actual WeatherAPI API key
+        const apiUrl = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}&temp_f`;
+
+        fetch(apiUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.current) {
+                    const temperature = Math.round(data.current.temp_f);
+                    const description = data.current.condition.text;
+
+                    weatherElement.innerHTML = `<h3>Temprature: ${temperature} ° F</h3>`;
+                    cityElement.innerHTML = `<h3>City: ${city}</h3>`;
+                } else {
+                    console.error('Error fetching weather data: Invalid API response');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching weather data:', error);
+            });
+    
+}
+
+    getUserLocation().then(city => {
+        if (city) {
+            updateWeather(city);
+        } else {
+            console.error('Unable to determine user location.');
+        }
+    });
+
+    setInterval(() => {
+        getUserLocation().then(city => {
+            if (city) {
+                updateWeather(city);
+            } else {
+                console.error('Unable to determine user location.');
+            }
+        });
+    }, 1800000);
+</script>
+</html>
