@@ -73,24 +73,33 @@ if (isCelsius) {
 }
 
 function convertAndDisplayTemperaturesToCelsius() {
-const temperatureElements = document.querySelectorAll('.temperature');
+    const temperatureElements = document.querySelectorAll('.temperature');
 
-temperatureElements.forEach((element) => {
-    const temperatureInFahrenheit = parseFloat(element.getAttribute('data-temperatureFahrenheit'));
-    const temperatureInCelsius = Math.round((temperatureInFahrenheit - 32) * (5 / 9)); // Round to the nearest whole number
-    element.textContent = `Temperature: ${temperatureInCelsius} °C`;
-});
+    temperatureElements.forEach((element) => {
+        const temperatureInFahrenheit = element.getAttribute('data-temperatureFahrenheit');
+        if (temperatureInFahrenheit !== null) {
+            const temperatureInCelsius = Math.round((parseFloat(temperatureInFahrenheit) - 32) * (5 / 9));
+            element.setAttribute('data-temperatureCelsius', temperatureInCelsius);
+            element.textContent = `Temperature: ${temperatureInCelsius} °C`;
+        }
+    });
 }
 
 function convertAndDisplayTemperaturesToFahrenheit() {
-const temperatureElements = document.querySelectorAll('.temperature');
+    const temperatureElements = document.querySelectorAll('.temperature');
 
-temperatureElements.forEach((element) => {
-    const temperatureInCelsius = parseFloat(element.getAttribute('data-temperatureCelsius'));
-    const temperatureInFahrenheit = Math.round((temperatureInCelsius * 9 / 5) + 32); // Round to the nearest whole number
-    element.textContent = `Temperature: ${temperatureInFahrenheit} °F`;
-});
+    temperatureElements.forEach((element) => {
+        const temperatureInCelsius = element.getAttribute('data-temperatureCelsius');
+        if (temperatureInCelsius !== null) {
+            const temperatureInFahrenheit = Math.round((parseFloat(temperatureInCelsius) * 9 / 5) + 32);
+            element.setAttribute('data-temperatureFahrenheit', temperatureInFahrenheit);
+            element.textContent = `Temperature: ${temperatureInFahrenheit} °F`;
+        }
+    });
 }
+
+
+
 
 
 function getUserLocation() {
@@ -110,34 +119,232 @@ function getUserLocation() {
 }
 
 function updateWeather(city, country) {
-const weatherElement = document.querySelector('.weather');
-const cityElement = document.querySelector('.city-text');
-const apiKey = "c152eb69aece48a8817210931232509"; // Replace with your actual WeatherAPI API key
-const apiUrl = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}`;
+    const weatherElement = document.querySelector('.weather');
+    const cityElement = document.querySelector('.city-text');
+    const apiKey = "c152eb69aece48a8817210931232509"; // Replace with your actual WeatherAPI API key
+    const apiUrl = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}`;
 
-fetch(apiUrl)
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        if (data.current) {
-            const temperatureFahrenheit = Math.round(data.current.temp_f);
-            const temperatureCelsius = Math.round(data.current.temp_c);
+    // Map of country codes to their abbreviations
+    const countryAbbreviations = {
+        'United States of America': '🇺🇸 USA',
+        'Afghanistan': '🇦🇫 AF',
+        'Albania': '🇦🇱 AL',
+        'Algeria': '🇩🇿 DZ',
+        'Andorra': '🇦🇩 AD',
+        'Angola': '🇦🇴 AO',
+        'Antigua and Barbuda': '🇦🇬 AG',
+        'Argentina': '🇦🇷 AR',
+        'Armenia': '🇦🇲 AM',
+        'Australia': '🇦🇺 AU',
+        'Austria': '🇦🇹 AT',
+        'Azerbaijan': '🇦🇿 AZ',
+        'Bahamas': '🇧🇸 BS',
+        'Bahrain': '🇧🇭 BH',
+        'Bangladesh': '🇧🇩 BD',
+        'Barbados': '🇧🇧 BB',
+        'Belarus': '🇧🇾 BY',
+        'Belgium': '🇧🇪 BE',
+        'Belize': '🇧🇿 BZ',
+        'Benin': '🇧🇯 BJ',
+        'Bhutan': '🇧🇹 BT',
+        'Bolivia': '🇧🇴 BO',
+        'Bosnia and Herzegovina': '🇧🇦 BA',
+        'Botswana': '🇧🇼 BW',
+        'Brazil': '🇧🇷 BR',
+        'Brunei': '🇧🇳 BN',
+        'Bulgaria': '🇧🇬 BG',
+        'Burkina Faso': '🇧🇫 BF',
+        'Burundi': '🇧🇮 BI',
+        'Cabo Verde': '🇨🇻 CV',
+        'Cambodia': '🇰🇭 KH',
+        'Cameroon': '🇨🇲 CM',
+        'Canada': '🇨🇦 CA',
+        'Central African Republic': '🇨🇫 CF',
+        'Chad': '🇹🇩 TD',
+        'Chile': '🇨🇱 CL',
+        'China': '🇨🇳 CN',
+        'Colombia': '🇨🇴 CO',
+        'Comoros': '🇰🇲 KM',
+        'Congo': '🇨🇬 CG',
+        'Costa Rica': '🇨🇷 CR',
+        'Cote d\'Ivoire': '🇨🇮 CI',
+        'Croatia': '🇭🇷 HR',
+        'Cuba': '🇨🇺 CU',
+        'Cyprus': '🇨🇾 CY',
+        'Czechia': '🇨🇿 CZ',
+        'Denmark': '🇩🇰 DK',
+        'Djibouti': '🇩🇯 DJ',
+        'Dominica': '🇩🇲 DM',
+        'Dominican Republic': '🇩🇴 DO',
+        'Ecuador': '🇪🇨 EC',
+        'Egypt': '🇪🇬 EG',
+        'El Salvador': '🇸🇻 SV',
+        'Equatorial Guinea': '🇬🇶 GQ',
+        'Eritrea': '🇪🇷 ER',
+        'Estonia': '🇪🇪 EE',
+        'Eswatini': '🇸🇿 SZ',
+        'Ethiopia': '🇪🇹 ET',
+        'Fiji': '🇫🇯 FJ',
+        'Finland': '🇫🇮 FI',
+        'France': '🇫🇷 FR',
+        'Gabon': '🇬🇦 GA',
+        'Gambia': '🇬🇲 GM',
+        'Georgia': '🇬🇪 GE',
+        'Germany': '🇩🇪 DE',
+        'Ghana': '🇬🇭 GH',
+        'Greece': '🇬🇷 GR',
+        'Grenada': '🇬🇩 GD',
+        'Guatemala': '🇬🇹 GT',
+        'Guinea': '🇬🇳 GN',
+        'Guinea-Bissau': '🇬🇼 GW',
+        'Guyana': '🇬🇾 GY',
+        'Haiti': '🇭🇹 HT',
+        'Honduras': '🇭🇳 HN',
+        'Hungary': '🇭🇺 HU',
+        'Iceland': '🇮🇸 IS',
+        'India': '🇮🇳 IN',
+        'Indonesia': '🇮🇩 ID',
+        'Iran': '🇮🇷 IR',
+        'Iraq': '🇮🇶 IQ',
+        'Ireland': '🇮🇪 IE',
+        'Israel': '🇮🇱 IL',
+        'Italy': '🇮🇹 IT',
+        'Jamaica': '🇯🇲 JM',
+        'Japan': '🇯🇵 JP',
+        'Jordan': '🇯🇴 JO',
+        'Kazakhstan': '🇰🇿 KZ',
+        'Kenya': '🇰🇪 KE',
+        'Kiribati': '🇰🇮 KI',
+        'Korea (North)': '🇰🇵 KP',
+        'Korea (South)': '🇰🇷 KR',
+        'Kosovo': '🇽🇰 XK',
+        'Kuwait': '🇰🇼 KW',
+        'Kyrgyzstan': '🇰🇬 KG',
+        'Laos': '🇱🇦 LA',
+        'Latvia': '🇱🇻 LV',
+        'Lebanon': '🇱🇧 LB',
+        'Lesotho': '🇱🇸 LS',
+        'Liberia': '🇱🇷 LR',
+        'Libya': '🇱🇾 LY',
+        'Liechtenstein': '🇱🇮 LI',
+        'Lithuania': '🇱🇹 LT',
+        'Luxembourg': '🇱🇺 LU',
+        'Madagascar': '🇲🇬 MG',
+        'Malawi': '🇲🇼 MW',
+        'Malaysia': '🇲🇾 MY',
+        'Maldives': '🇲🇻 MV',
+        'Mali': '🇲🇱 ML',
+        'Malta': '🇲🇹 MT',
+        'Marshall Islands': '🇲🇭 MH',
+        'Mauritania': '🇲🇷 MR',
+        'Mauritius': '🇲🇺 MU',
+        'Mexico': '🇲🇽 MX',
+        'Micronesia': '🇫🇲 FM',
+        'Moldova': '🇲🇩 MD',
+        'Monaco': '🇲🇨 MC',
+        'Mongolia': '🇲🇳 MN',
+        'Montenegro': '🇲🇪 ME',
+        'Morocco': '🇲🇦 MA',
+        'Mozambique': '🇲🇿 MZ',
+        'Myanmar': '🇲🇲 MM',
+        'Namibia': '🇳🇦 NA',
+        'Nauru': '🇳🇷 NR',
+        'Nepal': '🇳🇵 NP',
+        'Netherlands': '🇳🇱 NL',
+        'New Zealand': '🇳🇿 NZ',
+        'Nicaragua': '🇳🇮 NI',
+        'Niger': '🇳🇪 NE',
+        'Nigeria': '🇳🇬 NG',
+        'North Macedonia': '🇲🇰 MK',
+        'Norway': '🇳🇴 NO',
+        'Oman': '🇴🇲 OM',
+        'Pakistan': '🇵🇰 PK',
+        'Palau': '🇵🇼 PW',
+        'Palestine': '🇵🇸 PS',
+        'Panama': '🇵🇦 PA',
+        'Papua New Guinea': '🇵🇬 PG',
+        'Paraguay': '🇵🇾 PY',
+        'Peru': '🇵🇪 PE',
+        'Philippines': '🇵🇭 PH',
+        'Poland': '🇵🇱 PL',
+        'Portugal': '🇵🇹 PT',
+        'Qatar': '🇶🇦 QA',
+        'Romania': '🇷🇴 RO',
+        'Russia': '🇷🇺 RU',
+        'Rwanda': '🇷🇼 RW',
+        'Saint Kitts and Nevis': '🇰🇳 KN',
+        'Saint Lucia': '🇱🇨 LC',
+        'Saint Vincent and the Grenadines': '🇻🇨 VC',
+        'Samoa': '🇼🇸 WS',
+        'San Marino': '🇸🇲 SM',
+        'Sao Tome and Principe': '🇸🇹 ST',
+        'Saudi Arabia': '🇸🇦 SA',
+        'Senegal': '🇸🇳 SN',
+        'Serbia': '🇷🇸 RS',
+        'Seychelles': '🇸🇨 SC',
+        'Sierra Leone': '🇸🇱 SL',
+        'Singapore': '🇸🇬 SG',
+        'Slovakia': '🇸🇰 SK',
+        'Slovenia': '🇸🇮 SI',
+        'Solomon Islands': '🇸🇧 SB',
+        'Somalia': '🇸🇴 SO',
+        'South Africa': '🇿🇦 ZA',
+        'South Sudan': '🇸🇸 SS',
+        'Spain': '🇪🇸 ES',
+        'Sri Lanka': '🇱🇰 LK',
+        'Sudan': '🇸🇩 SD',
+        'Suriname': '🇸🇷 SR',
+        'Sweden': '🇸🇪 SE',
+        'Switzerland': '🇨🇭 CH',
+        'Syria': '🇸🇾 SY',
+        'Taiwan': '🇹🇼 TW',
+        'Tajikistan': '🇹🇯 TJ',
+        'Tanzania': '🇹🇿 TZ',
+        'Thailand': '🇹🇭 TH',
+        'Timor-Leste': '🇹🇱 TL',
+        'Togo': '🇹🇬 TG',
+        'Tonga': '🇹🇴 TO',
+        'Trinidad and Tobago': '🇹🇹 TT',
+        'Tunisia': '🇹🇳 TN',
+        'Turkey': '🇹🇷 TR',
+        'Turkmenistan': '🇹🇲 TM',
+        'Tuvalu': '🇹🇻 TV',
+        'Uganda': '🇺🇬 UG',
+        'Ukraine': '🇺🇦 UA',
+        'United Arab Emirates': '🇦🇪 AE',
+        'United Kingdom': '🇬🇧 GB',
+        'Uruguay': '🇺🇾 UY',
+        'Uzbekistan': '🇺🇿 UZ'
+    }    
 
-            // Store both Fahrenheit and Celsius temperatures in data attributes
-            weatherElement.innerHTML = `<h3 class="temperature" data-temperatureFahrenheit="${temperatureFahrenheit}" data-temperatureCelsius="${temperatureCelsius}">Temperature: ${temperatureFahrenheit} °F</h3>`;
-            cityElement.innerHTML = `<h3>Location: ${city}, ${country}</h3>`;
-        } else {
-            console.error('Error fetching weather data: Invalid API response');
-        }
-    })
-    .catch(error => {
-        console.error('Error fetching weather data:', error);
-    });
+    fetch(apiUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.location && data.location.name && data.location.country) {
+                const temperatureFahrenheit = Math.round(data.current.temp_f);
+                const temperatureCelsius = Math.round(data.current.temp_c);
+
+                // Get the abbreviated country name
+                const abbreviatedCountry = countryAbbreviations[data.location.country] || data.location.country;
+
+                // Store both Fahrenheit and Celsius temperatures in data attributes
+                weatherElement.innerHTML = `<h3 class="temperature" data-temperatureFahrenheit="${temperatureFahrenheit}" data-temperatureCelsius="${temperatureCelsius}">Temperature: ${temperatureFahrenheit} °F</h3>`;
+                cityElement.innerHTML = `<h3>Location: ${data.location.name}, ${data.location.region ? data.location.region + ', ' : ''}${abbreviatedCountry}</h3>`;
+            } else {
+                console.error('Error fetching weather data: Invalid API response');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching weather data:', error);
+        });
 }
+
+
 
 getUserLocation().then(location => {
 if (location) {

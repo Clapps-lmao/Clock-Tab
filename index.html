@@ -6,8 +6,28 @@
     <link rel="stylesheet" type="text/css" href="index.css">
     <meta property="og:title" content="Clock Tab">
     <meta property="og:description" content="Stay up-to-date with the time and weather in your city with the Clock Tab. Customize settings, check the temperature, and more.">
+    <script src="preloading-screen.js"></script>
 </head>
 <body>
+
+    <div class="preloading-screen">
+        <div class="inner-preloading-screen">
+
+            <div class="clock">
+                <div class="wrap">
+                  <span class="hour"></span>
+                  <span class="minute"></span>
+                  <span class="second"></span>
+                  <span class="dot"></span>
+                  <script src="clock.js"></script>
+                </div>
+              </div>
+
+        <h3 class="loading-text">Loading</h3>
+        </div>
+
+    </div>
+
 
     <div id="settings-btn" class="setting-button" onclick="openSettingsModal()">
         <img src="settings.png" alt="Settings" class="settings-icon">
@@ -28,6 +48,9 @@
             <option value="12">12-hour format</option>
             <option value="24">24-hour format</option>
         </select>
+
+
+        <a href="https://raw.githubusercontent.com/Clapps-lmao/Clock-Tab/main/updates.txt" class="dev-notes" target="_blank">Dev Notes & Upcoming Updates</a>
         </div>
     </div>
 
