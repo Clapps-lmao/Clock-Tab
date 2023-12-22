@@ -9,6 +9,7 @@
     <script src="preloading-screen.js"></script>
 </head>
 <body>
+    <audio id="notificationAudio" src="notification.mp3"></audio>
 
     <div class="preloading-screen">
         <div class="inner-preloading-screen">
@@ -50,7 +51,7 @@
         </select>
 
 
-        <a href="https://raw.githubusercontent.com/Clapps-lmao/Clock-Tab/main/updates.txt" class="dev-notes" target="_blank">Dev Notes & Upcoming Updates</a>
+        <a href="/updates/updates.html" class="dev-notes" target="_blank">Upcoming Updates</a>
         </div>
     </div>
 
@@ -63,7 +64,49 @@
     </div>
     <div id="city-text" class="city-text">
         <h3>Location:</h3>
+    </div>    
+    
+    
+
+
+    <div id="timer-button" onclick="openTimerModal()" class="timer-btn">Timer</div>
+    <div id="timer-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeTimerModal()">&times;</span>
+
+            <div class="circle" style="transform: translateY(80px);">
+                <!-- <div class="display-remain-time">00:30</div> -->
+                <svg width="300" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+                   <g transform="translate(110,110)">
+                      <circle r="100" class="e-c-base"/>
+                      <g transform="rotate(-90)">
+                         <circle r="100" class="e-c-progress"/>
+                         <g id="e-pointer">
+                            <circle cx="100" cy="0" r="8" class="e-c-pointer"/>
+                         </g>
+                      </g>
+                   </g>
+                   <div class="display-remain-time">00:30</div>
+                </svg>
+              </div>
+            <div class="setters">
+                <div class="minutes-set">
+                  <button data-setter="minutes-plus">+</button>
+                  <button data-setter="minutes-minus">-</button>
+                </div>
+                <div class="seconds-set">
+                  <button data-setter="seconds-plus">+</button>
+                  <button data-setter="seconds-minus">-</button>
+                </div>
+              </div>
+              <div class="controlls">
+                <button class="play" id="pause"></button>
+            </div>
+            </div>
+                
+        </div>
     </div>
+    
 
     <div id="social-bar" class="social bar">
         <a href="https://github.com/clapps-lmao" target="_blank">
